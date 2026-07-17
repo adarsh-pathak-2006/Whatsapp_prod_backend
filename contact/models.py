@@ -15,7 +15,7 @@ class Profile(models.Model):
     
 class Contact(models.Model):
     name=models.CharField(max_length=200)
-    user=models.ManyToManyField(Profile)
+    user=models.ManyToManyField(Profile, related_name='contacts')
 
     def __str__(self):
         return self.name
