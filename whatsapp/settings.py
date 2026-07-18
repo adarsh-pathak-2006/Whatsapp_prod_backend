@@ -115,7 +115,7 @@ USE_TZ = True
 
 AUTH_USER_MODEL="contact.User"
 
-MEDIA_ROOT=os.path.join[BASE_DIR, 'media']
+MEDIA_ROOT=os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL='/media/'
 
