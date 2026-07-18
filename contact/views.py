@@ -4,9 +4,12 @@ from contact.serializers import RegisterSerializer, ProfileSerailizer, ContactSe
 from contact.models import User, Profile, Contact
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from whatsapp.throttle import BasicThrottle, RegisterThrottle, TokenObtainThrottle
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class RegisterAPI(APIView):
+    throttle_classes=[RegisterThrottle]
     def post(self, request):
         serial=RegisterSerializer(data=request.data)
         if serial.is_valid():
@@ -28,9 +31,13 @@ class RegisterAPI(APIView):
                 return Response({ 'invalid':'invalid mobile number length' }, status=400)
         else:
             return Response(serial.errors, status=400)
-        
+
+
+class CustomTokenObtain(TokenObtainPairView):
+    throttle_classes=[TokenObtainThrottle]
 
 class MyProfileAPI(APIView):
+    throttle_classes=[BasicThrottle]
     permission_classes=[IsAuthenticated]
     def get(self, request):
         profile_data=get_object_or_404(Profile, user=request.user)
@@ -49,6 +56,7 @@ class MyProfileAPI(APIView):
 
 class ContactAPI(APIView):
     permission_classes=[IsAuthenticated]
+    throttle_classes=[BasicThrottle]
     def get(self, request):
         profile_data=get_object_or_404(Profile, user=request.user)
         contact_data=Contact.objects.filter(contact_of=profile_data)
@@ -66,6 +74,7 @@ class ContactAPI(APIView):
         
 class ContactIndividualAPI(APIView):
     permission_classes=[IsAuthenticated]
+    throttle_classes=[BasicThrottle]
     def get(self, request, n):
         profile_data=get_object_or_404(Profile, user=request.user)
         data=get_object_or_404(Contact, contact_of=profile_data, name=n)

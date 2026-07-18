@@ -6,9 +6,11 @@ from contact.models import Profile
 from rest_framework.response import Response
 from group.permission import IsGroupAdmin
 from rest_framework.permissions import IsAuthenticated
+from whatsapp.throttle import BasicThrottle
 
 
 class GroupAPI(APIView):
+    throttle_classes=[BasicThrottle]
     permission_classes=[IsAuthenticated]
     def get(self, request):
         profile_data=Profile.objects.get(user=request.user)
@@ -27,6 +29,7 @@ class GroupAPI(APIView):
             return Response(serial.errors, status=400)
         
 class GroupIndividualAPI(APIView):
+    throttle_classes=[BasicThrottle]
     def get_permissions(self):
         if self.request.method=='GET':
             return [IsAuthenticated()]
@@ -52,6 +55,7 @@ class GroupIndividualAPI(APIView):
         return Response({ 'group deleted':'group successfully deleted' }, status=204)
 
 class MemberAPI(APIView):
+    throttle_classes=[BasicThrottle]
     def get_permissions(self):
         if self.request.method=='GET':
             return [IsAuthenticated()]
@@ -73,6 +77,7 @@ class MemberAPI(APIView):
             return Response(serial.errors, status=400)
               
 class MemberIndividualAPI(APIView):
+    throttle_classes=[BasicThrottle]
     def get_permissions(self):
         if self.request.method=='GET':
             return [IsAuthenticated()]
@@ -96,6 +101,7 @@ class MemberIndividualAPI(APIView):
 
 
 class GroupChatAPI(APIView):
+    throttle_classes=[BasicThrottle]
     permission_classes=[IsAuthenticated]
     def get(self, request, pk):
         group_data=get_object_or_404(Group, id=pk)
