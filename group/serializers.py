@@ -4,6 +4,7 @@ from contact.serializers import ProfileSerailizer
 
 
 class GroupSerializer(ModelSerializer):
+    created_by=ProfileSerailizer(read_only=True)
     class Meta:
         model=Group
         fields='__all__'
@@ -18,7 +19,7 @@ class MemberSerializer(ModelSerializer):
 
 class GroupChatSerializer(ModelSerializer):
     group=GroupSerializer(read_only=True)
-    sent_by=ProfileSerailizer(read_only=True)
+    sent_by=MemberSerializer(read_only=True)
     class Meta:
         model=GroupChat
         fields='__all__'

@@ -3,6 +3,7 @@ from contact.models import Profile
 
 
 class Group(models.Model):
+    created_by=models.ForeignKey(Profile, on_delete=models.CASCADE)
     name=models.CharField(max_length=200)
     about=models.CharField(max_length=500, blank=True, null=True)
     created_on=models.DateTimeField(auto_now_add=True)
@@ -12,8 +13,8 @@ class Group(models.Model):
 
 
 class Member(models.Model):
-    group=models.ForeignKey(Group, on_delete=models.CASCADE, name='member_in_the_group')
-    user=models.ManyToManyField(Profile, related_name='groups')
+    group=models.ForeignKey(Group, on_delete=models.CASCADE, related_name='member_in_the_group')
+    user=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='groups')
     joined_on=models.DateTimeField(auto_now_add=True)
     is_admin=models.BooleanField(default=False)
 
