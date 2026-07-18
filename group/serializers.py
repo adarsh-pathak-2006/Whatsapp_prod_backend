@@ -1,6 +1,7 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 from group.models import Group, Member, GroupChat
 from contact.serializers import ProfileSerailizer
+from contact.models import Profile
 
 
 class GroupSerializer(ModelSerializer):
@@ -12,10 +13,15 @@ class GroupSerializer(ModelSerializer):
 
 class MemberSerializer(ModelSerializer):
     group=GroupSerializer(read_only=True)
-    user=ProfileSerailizer(read_only=True)
+    user=PrimaryKeyRelatedField(queryset=Profile.objects.all())
     class Meta:
         model=Member
         fields=['group', 'user', 'joined_on', 'is_admin']
+
+class MemberUpdateSerializer(ModelSerializer):
+    class Meta:
+        model=Member
+        fields=['is_admin']
 
 class GroupChatSerializer(ModelSerializer):
     group=GroupSerializer(read_only=True)
@@ -23,3 +29,8 @@ class GroupChatSerializer(ModelSerializer):
     class Meta:
         model=GroupChat
         fields='__all__'
+
+class GroupUpdateSerializer(ModelSerializer):
+    class Meta:
+        model=Group
+        fields=['id', 'name', 'about']
