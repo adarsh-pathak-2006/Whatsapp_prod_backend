@@ -15,8 +15,11 @@ class Profile(models.Model):
     
 class Contact(models.Model):
     contact_of=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='the_contacts')
-    name=models.CharField(max_length=200, unique=True)
+    name=models.CharField(max_length=200)
     contact=models.ManyToManyField(Profile, related_name='contacts', blank=True)
+
+    class Meta:
+        unique_together = ('contact_of', 'name')
 
     def __str__(self):
         return self.name

@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from whatsapp.throttle import BasicThrottle
+from django.db.models import Q
 
 
 class ChatAPI(ListCreateAPIView):
@@ -16,14 +17,20 @@ class ChatAPI(ListCreateAPIView):
 
     def get_queryset(self):
         user_data=Profile.objects.get(user=self.request.user)
-        return Chat.objects.filter(user1=user_data)
+        return Chat.objects.filter(Q(user1=user_data) | Q(user2=user_data)).distinct()
+
+    def perform_create(self, serializer):
+        user_data=Profile.objects.get(user=self.request.user)
+        serializer.save(user1=user_data)
 
 class ConversationAPI(APIView):
     permission_classes=[IsAuthenticated]
     def get(self, request, pk):
         user_data=get_object_or_404(Profile, user=request.user)
-        chat_data=get_object_or_404(Chat, user1=user_data, id=pk)
-        convo=Conversation.objects.filter(chat=chat_data, sent_by=user_data)
+        chat_data=get_object_or_404(Chat, id=pk)
+        if chat_data.user1 != user_data and not chat_data.user2.filter(id=user_data.id).exists():
+            return Response({"error": "Forbidden"}, status=403)
+        convo=Conversation.objects.filter(chat=chat_data)
         serial=ConversationSerializer(convo, many=True)
         return Response(serial.data, status=200)
     
@@ -31,7 +38,9 @@ class ConversationAPI(APIView):
         serial=ConversationSerializer(data=request.data)
         if serial.is_valid():
             user_data=get_object_or_404(Profile, user=request.user)
-            chat_data=get_object_or_404(Chat, user1=user_data, id=pk)
+            chat_data=get_object_or_404(Chat, id=pk)
+            if chat_data.user1 != user_data and not chat_data.user2.filter(id=user_data.id).exists():
+                return Response({"error": "Forbidden"}, status=403)
             serial.save(chat=chat_data, sent_by=user_data)
             return Response(serial.data, status=201)
         else:

@@ -4,7 +4,7 @@ from contact.serializers import ProfileSerailizer
 
 class ChatSerializer(ModelSerializer):
     user1=ProfileSerailizer(read_only=True)
-    user2=ProfileSerailizer(read_only=True)
+    user2=ProfileSerailizer(read_only=True, many=True)
     class Meta:
         model=Chat
         fields='__all__'

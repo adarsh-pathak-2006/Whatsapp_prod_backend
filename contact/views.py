@@ -13,8 +13,8 @@ class RegisterAPI(APIView):
     def post(self, request):
         serial=RegisterSerializer(data=request.data)
         if serial.is_valid():
-            f_name=serial.validated_data['first_name']
-            l_name=serial.validated_data['last_name']
+            f_name=serial.validated_data.get('first_name', '')
+            l_name=serial.validated_data.get('last_name', '')
             username=serial.validated_data['username']
             email=serial.validated_data['email']
             mobile_no=serial.validated_data['mobile_no']
@@ -23,6 +23,8 @@ class RegisterAPI(APIView):
             if len(mobile_no)==10:
                 if User.objects.filter(username=username).exists():
                     return Response({ 'message':'user already exists' }, status=400)
+                elif User.objects.filter(mobile_no=mobile_no).exists():
+                    return Response({ 'message':'mobile number already registered' }, status=400)
                 else:
                     user_created=User.objects.create_user(first_name=f_name, last_name=l_name, username=username, email=email, mobile_no=mobile_no, password=password)
                     Profile.objects.create(user=user_created)

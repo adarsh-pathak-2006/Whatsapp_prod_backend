@@ -14,7 +14,7 @@ class GroupAPI(APIView):
     permission_classes=[IsAuthenticated]
     def get(self, request):
         profile_data=Profile.objects.get(user=request.user)
-        data=Group.objects.filter(created_by=profile_data)
+        data=Group.objects.filter(member_in_the_group__user=profile_data).distinct()
         serial=GroupSerializer(data, many=True)
         return Response(serial.data)
     
@@ -105,7 +105,7 @@ class GroupChatAPI(APIView):
     permission_classes=[IsAuthenticated]
     def get(self, request, pk):
         group_data=get_object_or_404(Group, id=pk)
-        data=GroupChat(group=group_data)
+        data=GroupChat.objects.filter(group=group_data)
         serial=GroupChatSerializer(data, many=True)
         return Response(serial.data, status=200)
     
@@ -114,7 +114,7 @@ class GroupChatAPI(APIView):
         if serial.is_valid():
             group_data=get_object_or_404(Group, id=pk)
             profile_data=Profile.objects.get(user=request.user)
-            sent_by=Member.objects.get(user=profile_data, group=group_data)
+            sent_by=get_object_or_404(Member, user=profile_data, group=group_data)
             serial.save(sent_by=sent_by, group=group_data)
             return Response(serial.data, status=201)
         else:
