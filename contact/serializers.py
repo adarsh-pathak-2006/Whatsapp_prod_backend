@@ -27,3 +27,8 @@ class ContactSerailizer(ModelSerializer):
     class Meta:
         model=Contact
         fields=['contact_of', 'name', 'contact']
+
+class ContactUpdateSerailizer(ModelSerializer):
+    class Meta:
+        model=Contact
+        fields=['name']
