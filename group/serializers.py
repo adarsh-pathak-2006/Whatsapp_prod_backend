@@ -13,7 +13,7 @@ class GroupSerializer(ModelSerializer):
 
 class MemberSerializer(ModelSerializer):
     group=GroupSerializer(read_only=True)
-    user=PrimaryKeyRelatedField(queryset=Profile.objects.all())
+    user=ProfileSerailizer(read_only=True)
     class Meta:
         model=Member
         fields=['group', 'user', 'joined_on', 'is_admin']

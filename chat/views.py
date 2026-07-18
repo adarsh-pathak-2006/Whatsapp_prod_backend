@@ -21,7 +21,17 @@ class ChatAPI(ListCreateAPIView):
 
     def perform_create(self, serializer):
         user_data=Profile.objects.get(user=self.request.user)
-        serializer.save(user1=user_data)
+        chat = serializer.save(user1=user_data)
+        
+        user2_username = self.request.data.get('user2')
+        if user2_username:
+            from contact.models import User
+            try:
+                target_user = User.objects.get(username=user2_username)
+                target_profile = Profile.objects.get(user=target_user)
+                chat.user2.add(target_profile)
+            except Exception:
+                pass
 
 class ConversationAPI(APIView):
     permission_classes=[IsAuthenticated]

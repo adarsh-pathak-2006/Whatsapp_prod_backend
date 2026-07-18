@@ -68,10 +68,25 @@ class MemberAPI(APIView):
         return Response(serial.data, status=200)
     
     def post(self, request, pk):
-        serial=MemberSerializer(data=request.data)
+        data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+        username = data.get('add_user')
+        target_profile = None
+        if username:
+            try:
+                from contact.models import User, Profile
+                target_user = User.objects.get(username=username)
+                target_profile = Profile.objects.get(user=target_user)
+            except Exception:
+                return Response({'error': 'User not found'}, status=400)
+                
+        serial=MemberSerializer(data=data)
         if serial.is_valid():
             group_data=get_object_or_404(Group, id=pk)
-            serial.save(group=group_data)
+            # if target_profile exists, pass it explicitly because user is read_only in serializer
+            if target_profile:
+                serial.save(group=group_data, user=target_profile)
+            else:
+                return Response({'error': 'add_user is required'}, status=400)
             return Response(serial.data, status=201)
         else:
             return Response(serial.errors, status=400)
@@ -114,7 +129,9 @@ class GroupChatAPI(APIView):
         if serial.is_valid():
             group_data=get_object_or_404(Group, id=pk)
             profile_data=Profile.objects.get(user=request.user)
-            sent_by=get_object_or_404(Member, user=profile_data, group=group_data)
+            sent_by = Member.objects.filter(user=profile_data, group=group_data).first()
+            if not sent_by:
+                return Response({'error': 'Not a member of this group'}, status=403)
             serial.save(sent_by=sent_by, group=group_data)
             return Response(serial.data, status=201)
         else:

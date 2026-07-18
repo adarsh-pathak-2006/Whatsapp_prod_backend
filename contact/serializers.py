@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer,  PrimaryKeyRelatedField
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, SlugRelatedField
 from contact.models import User, Profile, Contact
 
 class UserSerailizer(ModelSerializer):
@@ -19,10 +19,11 @@ class ProfileSerailizer(ModelSerializer):
         fields=['user', 'profile_photo', 'bio']
 
 class ContactSerailizer(ModelSerializer):
-    contact=PrimaryKeyRelatedField(queryset=Profile.objects.all(), many=True)
+    contact=SlugRelatedField(slug_field='user__username', queryset=Profile.objects.all(), many=True)
     class Meta:
         model=Contact
         fields=['contact_of', 'name', 'contact']
+        read_only_fields = ['contact_of']
 
 class ContactUpdateSerailizer(ModelSerializer):
     class Meta:
