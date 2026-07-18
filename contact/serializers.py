@@ -6,10 +6,6 @@ class UserSerailizer(ModelSerializer):
         model=User
         fields=['username', 'mobile_no']
 
-class UserDataEdit(ModelSerializer):
-    class Meta:
-        model=User
-        fields=['first_name', 'last_name', 'username', 'email']
 
 class RegisterSerializer(ModelSerializer):
     class Meta:

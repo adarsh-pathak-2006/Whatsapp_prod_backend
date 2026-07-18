@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
-from contact.serializers import RegisterSerializer, UserDataEdit, ProfileSerailizer, ContactSerailizer, ContactUpdateSerailizer
+from contact.serializers import RegisterSerializer, ProfileSerailizer, ContactSerailizer, ContactUpdateSerailizer
 from contact.models import User, Profile, Contact
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 
 class RegisterAPI(APIView):
@@ -30,6 +31,7 @@ class RegisterAPI(APIView):
         
 
 class MyProfileAPI(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request):
         profile_data=get_object_or_404(Profile, user=request.user)
         serial=ProfileSerailizer(profile_data)
@@ -46,6 +48,7 @@ class MyProfileAPI(APIView):
         
 
 class ContactAPI(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request):
         profile_data=get_object_or_404(Profile, user=request.user)
         contact_data=Contact.objects.filter(contact_of=profile_data)
@@ -62,6 +65,7 @@ class ContactAPI(APIView):
             return Response(serial.errors, status=400)
         
 class ContactIndividualAPI(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request, n):
         profile_data=get_object_or_404(Profile, user=request.user)
         data=get_object_or_404(Contact, contact_of=profile_data, name=n)
