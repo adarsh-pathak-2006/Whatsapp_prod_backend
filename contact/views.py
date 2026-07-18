@@ -37,7 +37,7 @@ class MyProfileAPI(APIView):
     
     def patch(self, request):
         instance=get_object_or_404(Profile, user=request.user)
-        serial=UserDataEdit(instance, data=request.data, partial=True)
+        serial=ProfileSerailizer(instance, data=request.data, partial=True)
         if serial.is_valid():
             serial.save()
             return Response(serial.data, status=200)

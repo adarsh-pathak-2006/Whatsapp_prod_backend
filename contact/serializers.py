@@ -23,7 +23,7 @@ class ProfileSerailizer(ModelSerializer):
         fields=['user', 'profile_photo', 'bio']
 
 class ContactSerailizer(ModelSerializer):
-    contact=PrimaryKeyRelatedField(queryset=Profile.objects.all())
+    contact=PrimaryKeyRelatedField(queryset=Profile.objects.all(), many=True)
     class Meta:
         model=Contact
         fields=['contact_of', 'name', 'contact']
