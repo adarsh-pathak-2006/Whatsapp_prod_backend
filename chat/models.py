@@ -1,8 +1,5 @@
 from django.db import models
-from django.conf import settings
 from contact.models import Profile
-
-User=settings.AUTH_USER_MODEL
 
 
 class Chat(models.Model):
