@@ -14,9 +14,9 @@ class Profile(models.Model):
         return self.user.username
     
 class Contact(models.Model):
-    contact_of=models.ForeignKey(Profile, 'the_contacts')
+    contact_of=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='the_contacts')
     name=models.CharField(max_length=200, unique=True)
-    contact=models.ManyToManyField(Profile, related_name='contacts', null=True, blank=True)
+    contact=models.ManyToManyField(Profile, related_name='contacts', blank=True)
 
     def __str__(self):
         return self.name

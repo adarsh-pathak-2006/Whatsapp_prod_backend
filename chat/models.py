@@ -4,7 +4,7 @@ from contact.models import Profile
 
 class Chat(models.Model):
     user1=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='chats')
-    user2=models.ManyToManyField(Profile, related_name='chatted with')
+    user2=models.ManyToManyField(Profile, related_name='chatted_with')
     created_at=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
