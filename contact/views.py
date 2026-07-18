@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
-from contact.serializers import RegisterSerializer, UserDataEdit, ProfileSerailizer, ContactSerailizer
+from contact.serializers import RegisterSerializer, UserDataEdit, ProfileSerailizer, ContactSerailizer, ContactUpdateSerailizer
 from contact.models import User, Profile, Contact
 from rest_framework.response import Response
 
@@ -60,3 +60,26 @@ class ContactAPI(APIView):
             return Response({'saved':'contact saved'}, status=201)
         else:
             return Response(serial.errors, status=400)
+        
+class ContactIndividualAPI(APIView):
+    def get(self, request, n):
+        profile_data=get_object_or_404(Profile, user=request.user)
+        data=get_object_or_404(Contact, contact_of=profile_data, name=n)
+        serial=ContactSerailizer(data)
+        return Response(serial.data, status=200)
+    
+    def put(self, request, n):
+        profile_data=get_object_or_404(Profile, user=request.user)
+        instance=get_object_or_404(Contact, contact_of=profile_data, name=n)
+        serial=ContactUpdateSerailizer(instance, data=request.data)
+        if serial.is_valid():
+            serial.save()
+            return Response({'updated':'contact_updated'}, status=201)
+        else:
+            return Response(serial.errors, status=400)
+    
+    def delete(self, request, n):
+        profile_data=get_object_or_404(Profile, user=request.user)
+        instance=get_object_or_404(Contact, contact_of=profile_data, name=n)
+        instance.delete()
+        return Response({'message':'deleted'}, status=204)
