@@ -20,5 +20,5 @@ class GroupChatSerializer(ModelSerializer):
     group=GroupSerializer(read_only=True)
     sent_by=ProfileSerailizer(read_only=True)
     class Meta:
-        model=Group
+        model=GroupChat
         fields='__all__'
