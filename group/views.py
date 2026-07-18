@@ -4,9 +4,12 @@ from group.models import Group, Member, GroupChat
 from rest_framework.views import APIView
 from contact.models import Profile
 from rest_framework.response import Response
+from group.permission import IsGroupAdmin
+from rest_framework.permissions import IsAuthenticated
 
 
 class GroupAPI(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request):
         profile_data=Profile.objects.get(user=request.user)
         data=Group.objects.filter(created_by=profile_data)
@@ -24,6 +27,11 @@ class GroupAPI(APIView):
             return Response(serial.errors, status=400)
         
 class GroupIndividualAPI(APIView):
+    def get_permissions(self):
+        if self.request.method=='GET':
+            return [IsAuthenticated()]
+        else:
+            return [IsGroupAdmin()]
     def get(self, request, pk):
         group_obj=get_object_or_404(Group, id=pk)
         serial=GroupSerializer(group_obj)
@@ -44,6 +52,11 @@ class GroupIndividualAPI(APIView):
         return Response({ 'group deleted':'group successfully deleted' }, status=204)
 
 class MemberAPI(APIView):
+    def get_permissions(self):
+        if self.request.method=='GET':
+            return [IsAuthenticated()]
+        else:
+            return [IsGroupAdmin()]
     def get(self, request, pk):
         group_data=get_object_or_404(Group, id=pk)
         data=Member.objects.filter(group=group_data)
@@ -60,6 +73,11 @@ class MemberAPI(APIView):
             return Response(serial.errors, status=400)
               
 class MemberIndividualAPI(APIView):
+    def get_permissions(self):
+        if self.request.method=='GET':
+            return [IsAuthenticated()]
+        else:
+            return [IsGroupAdmin()]
     def get(self, request, pk, ck):
         group_data=get_object_or_404(Group, id=pk)
         data=get_object_or_404(Member, group=group_data, id=ck)
@@ -69,7 +87,7 @@ class MemberIndividualAPI(APIView):
     def patch(self, request, pk, ck):
         group_data=get_object_or_404(Group, id=pk)
         instance=get_object_or_404(Member, group=group_data, id=ck)
-        serial=MemberUpdateSerializer(instance, data=request.data)
+        serial=MemberUpdateSerializer(instance, data=request.data, partial=True)
         if serial.is_valid():
             serial.save()
             return Response(serial.data, status=200)
@@ -78,6 +96,7 @@ class MemberIndividualAPI(APIView):
 
 
 class GroupChatAPI(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request, pk):
         group_data=get_object_or_404(Group, id=pk)
         data=GroupChat(group=group_data)
