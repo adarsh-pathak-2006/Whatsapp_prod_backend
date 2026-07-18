@@ -9,8 +9,8 @@ class ChatSerializer(ModelSerializer):
         model=Chat
         fields='__all__'
 
-class Conversation(ModelSerializer):
+class ConversationSerializer(ModelSerializer):
     sent_by=ProfileSerailizer(read_only=True)
     class Meta:
         model=Conversation
-        fields='__all__'
+        fields=['sent_by', 'message', 'time']
